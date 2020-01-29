@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - name: PortfolioManager
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: PortfolioManager
+      address: '0x06a5bf70bff314177488864fe03576ff608e6aec'
+      startBlock: 8533644
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      abis:
+        - name: PortfolioManager
+          file: ./abis/PortfolioManager.json
+      entities:
+        - Opportunity
+        - Portfolio
+        - Token
+      eventHandlers:
+        - event: LogMintOpportunityToken(bytes32,indexed bytes32)
+          handler: handleMintOpportunityToken

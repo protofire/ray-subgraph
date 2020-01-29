@@ -1,0 +1,15 @@
+type Opportunity @entity {
+  id: ID!
+  portfolio: Portfolio!
+  token: Token!
+}
+
+type Portfolio @entity {
+  id: ID!
+  opportunities: [Opportunity!]! @derivedFrom(field: "portfolio")
+}
+
+type Token @entity {
+  id: ID!
+  opportunities: [Opportunity!]! @derivedFrom(field: "token")
+}
