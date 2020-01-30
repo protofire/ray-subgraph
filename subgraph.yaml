@@ -18,9 +18,13 @@ dataSources:
         - name: PortfolioManager
           file: ./abis/PortfolioManager.json
       entities:
+        - User
+        - RAYToken
         - Opportunity
         - Portfolio
-        - Token
+        - OpportunityToken
       eventHandlers:
         - event: LogMintOpportunityToken(bytes32,indexed bytes32)
           handler: handleMintOpportunityToken
+        - event: LogMintRAYT(indexed bytes32,indexed bytes32,indexed address,uint256)
+          handler: handleMintRAYToken
