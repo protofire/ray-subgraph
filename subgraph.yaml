@@ -28,3 +28,7 @@ dataSources:
           handler: handleMintOpportunityToken
         - event: LogMintRAYT(indexed bytes32,indexed bytes32,indexed address,uint256)
           handler: handleMintRAYToken
+        - event: LogDepositToRAYT(indexed bytes32,uint256,uint256)
+          handler: handleDepositToRAYToken
+        - event: LogWithdrawFromRAYT(indexed bytes32,uint256,uint256)
+          handler: handleWithdrawFromRAYToken

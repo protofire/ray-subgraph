@@ -1,24 +1,57 @@
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  MINT
+  BURN
+}
+
 type User @entity {
   id: ID!
+  "Blockchain adress of the user"
   address: Bytes!
+  "RAYTokens that the user posseses"
   token: [RAYToken!]! @derivedFrom(field: "owner")
 }
 
 type RAYToken @entity {
   id: ID!
+  "User that owns the RAYToken"
   owner: User!
+  "Portfolio associated with the RAYToken"
   portfolio: Portfolio!
+  "Total value of the RAYToken"
   value: BigInt!
+  "List of all transactions which modified this token"
+  transactions: [RAYTokenTransaction!]! @derivedFrom(field: "token")
+}
+
+type RAYTokenTransaction @entity {
+  id: ID!
+  "Transaction type"
+  type: TransactionType!
+  "Token which the transaction modifies"
+  token: RAYToken!
+  "Transaction value"
+  value: BigInt!
+  "Token value before the transaction happened"
+  tokenValueBefore: BigInt!
+  "Token value after the transaction happened"
+  tokenValueAfter: BigInt!
+  "Block timestamp of the transaction"
+  timestamp: BigInt!
 }
 
 type Opportunity @entity {
   id: ID!
+  "Portfolio which has this opportunity listed"
   portfolio: Portfolio!
+  "Token which reprsents the position of the portfolio on this Opportunity"
   token: OpportunityToken!
 }
 
 type Portfolio @entity {
   id: ID!
+  "Opportunities which this Portfolio has tokens in"
   opportunities: [Opportunity!]! @derivedFrom(field: "portfolio")
 }
 
