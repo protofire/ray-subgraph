@@ -5,6 +5,7 @@ import {
   LogMintRAYT,
   LogDepositToRAYT,
   LogWithdrawFromRAYT,
+  LogBurnRAYT,
 } from '../generated/PortfolioManager/PortfolioManager'
 
 import { User, RAYToken, Opportunity, Portfolio, OpportunityToken, RAYTokenTransaction } from '../generated/schema'
@@ -25,6 +26,7 @@ export function handleMintRAYToken(event: LogMintRAYT): void {
   rayToken.owner = event.params.beneficiary.toHexString()
   rayToken.value = event.params.value
   rayToken.portfolio = portfolio.id
+  rayToken.isActive = true
 
   transaction.token = rayToken.id
   transaction.value = event.params.value
@@ -43,7 +45,7 @@ export function handleDepositToRAYToken(event: LogDepositToRAYT): void {
   let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
 
   if (rayToken == null) {
-    log.warning('RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
+    log.warning('[DEPOSIT] RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
   } else {
     transaction.type = depositType
     transaction.value = event.params.value
@@ -60,12 +62,56 @@ export function handleDepositToRAYToken(event: LogDepositToRAYT): void {
   }
 }
 
-export function handleWithdrawFromRAYToken(event: LogWithdrawFromRAYT): void {}
+export function handleWithdrawFromRAYToken(event: LogWithdrawFromRAYT): void {
+  let rayToken = RAYToken.load(event.params.tokenId.toHexString())
+  let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
+
+  if (rayToken == null) {
+    log.warning('[WITHDRAW] RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
+  } else {
+    transaction.type = withdrawType
+    transaction.value = event.params.value
+    transaction.token = rayToken.id
+    transaction.timestamp = event.block.timestamp
+    transaction.tokenValueBefore = rayToken.value
+
+    rayToken.value = event.params.tokenValue - event.params.value
+
+    transaction.tokenValueAfter = rayToken.value
+
+    rayToken.save()
+    transaction.save()
+  }
+}
+
+export function handleBurnRAYToken(event: LogBurnRAYT): void {
+  let rayToken = RAYToken.load(event.params.tokenId.toHexString())
+  let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
+
+  if (rayToken == null) {
+    log.warning('[BURN] RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
+  } else {
+    transaction.type = burnType
+    transaction.value = event.params.value
+    transaction.token = rayToken.id
+    transaction.timestamp = event.block.timestamp
+    transaction.tokenValueBefore = rayToken.value
+
+    rayToken.value = ZERO
+    rayToken.isActive = false
+
+    transaction.tokenValueAfter = ZERO
+
+    rayToken.save()
+    transaction.save()
+  }
+}
 
 export function handleMintOpportunityToken(event: LogMintOpportunityToken): void {
   let portfolio = getOrCreatePortfolio(event.params.portfolioId)
   let token = getOrCreateOpportunityToken(event.params.tokenId)
 
+  // We probably should replace the Opportunity ID with something a little bit more related
   let opportunity = new Opportunity(event.transaction.hash.toHexString() + '-' + event.logIndex.toString())
   opportunity.portfolio = portfolio.id
   opportunity.token = token.id

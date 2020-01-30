@@ -23,6 +23,8 @@ type RAYToken @entity {
   value: BigInt!
   "List of all transactions which modified this token"
   transactions: [RAYTokenTransaction!]! @derivedFrom(field: "token")
+  "Represents the status of the RAYToken. If burnt this will be false"
+  isActive: Boolean!
 }
 
 type RAYTokenTransaction @entity {

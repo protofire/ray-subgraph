@@ -32,3 +32,5 @@ dataSources:
           handler: handleDepositToRAYToken
         - event: LogWithdrawFromRAYT(indexed bytes32,uint256,uint256)
           handler: handleWithdrawFromRAYToken
+        - event: LogBurnRAYT(indexed bytes32,indexed address,uint256,uint256)
+          handler: handleBurnRAYToken
