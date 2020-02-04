@@ -20,7 +20,10 @@ dataSources:
       entities:
         - User
         - RAYToken
-        - RAYTokenTransaction
+        - DepositEvent
+        - WithdrawEvent
+        - MintEvent
+        - BurnEvent
         - Opportunity
         - Portfolio
         - OpportunityToken

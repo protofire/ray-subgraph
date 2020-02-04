@@ -8,12 +8,17 @@ import {
   LogBurnRAYT,
 } from '../generated/PortfolioManager/PortfolioManager'
 
-import { User, RAYToken, Opportunity, Portfolio, OpportunityToken, RAYTokenTransaction } from '../generated/schema'
-
-const depositType = 'DEPOSIT'
-const withdrawType = 'WITHDRAW'
-const mintType = 'MINT'
-const burnType = 'BURN'
+import {
+  User,
+  RAYToken,
+  Opportunity,
+  Portfolio,
+  OpportunityToken,
+  DepositEvent,
+  WithdrawEvent,
+  MintEvent,
+  BurnEvent,
+} from '../generated/schema'
 
 let ZERO = BigInt.fromI32(0)
 
@@ -21,89 +26,98 @@ export function handleMintRAYToken(event: LogMintRAYT): void {
   let user = getOrCreateUser(event.params.beneficiary)
   let rayToken = getOrCreateRayToken(event.params.tokenId)
   let portfolio = getOrCreatePortfolio(event.params.portfolioId)
-  let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
+  let tokenEventId = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let tokenEvent = new MintEvent(tokenEventId)
 
   rayToken.owner = event.params.beneficiary.toHexString()
   rayToken.value = event.params.value
   rayToken.portfolio = portfolio.id
   rayToken.isActive = true
 
-  transaction.token = rayToken.id
-  transaction.value = event.params.value
-  transaction.tokenValueBefore = ZERO
-  transaction.tokenValueAfter = event.params.value
-  transaction.type = mintType
-  transaction.timestamp = event.block.timestamp
+  tokenEvent.block = event.block.number
+  tokenEvent.timestamp = event.block.timestamp
+  tokenEvent.transaction = event.transaction.hash
+
+  tokenEvent.minter = event.address
+  tokenEvent.token = rayToken.id
+  tokenEvent.value = event.params.value
 
   user.save()
   rayToken.save()
-  transaction.save()
+  tokenEvent.save()
 }
 
 export function handleDepositToRAYToken(event: LogDepositToRAYT): void {
   let rayToken = RAYToken.load(event.params.tokenId.toHexString())
-  let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
+  let tokenEventId = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let tokenEvent = new DepositEvent(tokenEventId)
 
   if (rayToken == null) {
     log.warning('[DEPOSIT] RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
   } else {
-    transaction.type = depositType
-    transaction.value = event.params.value
-    transaction.token = rayToken.id
-    transaction.timestamp = event.block.timestamp
-    transaction.tokenValueBefore = rayToken.value
+    tokenEvent.block = event.block.number
+    tokenEvent.timestamp = event.block.timestamp
+    tokenEvent.transaction = event.transaction.hash
+
+    tokenEvent.sender = event.address
+    tokenEvent.value = event.params.value
+    tokenEvent.token = rayToken.id
+    tokenEvent.tokenValueBefore = rayToken.value
 
     rayToken.value = event.params.tokenValue + event.params.value
 
-    transaction.tokenValueAfter = rayToken.value
+    tokenEvent.tokenValueAfter = rayToken.value
 
     rayToken.save()
-    transaction.save()
+    tokenEvent.save()
   }
 }
 
 export function handleWithdrawFromRAYToken(event: LogWithdrawFromRAYT): void {
   let rayToken = RAYToken.load(event.params.tokenId.toHexString())
-  let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
+  let tokenEventId = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let tokenEvent = new WithdrawEvent(tokenEventId)
 
   if (rayToken == null) {
     log.warning('[WITHDRAW] RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
   } else {
-    transaction.type = withdrawType
-    transaction.value = event.params.value
-    transaction.token = rayToken.id
-    transaction.timestamp = event.block.timestamp
-    transaction.tokenValueBefore = rayToken.value
+    tokenEvent.block = event.block.number
+    tokenEvent.timestamp = event.block.timestamp
+    tokenEvent.transaction = event.transaction.hash
+
+    tokenEvent.value = event.params.value
+    tokenEvent.token = rayToken.id
+    tokenEvent.tokenValueBefore = rayToken.value
 
     rayToken.value = event.params.tokenValue - event.params.value
 
-    transaction.tokenValueAfter = rayToken.value
+    tokenEvent.tokenValueAfter = rayToken.value
 
     rayToken.save()
-    transaction.save()
+    tokenEvent.save()
   }
 }
 
 export function handleBurnRAYToken(event: LogBurnRAYT): void {
   let rayToken = RAYToken.load(event.params.tokenId.toHexString())
-  let transaction = getOrCreateRayTokenTransaction(event.transaction.hash)
+  let tokenEventId = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let tokenEvent = new BurnEvent(tokenEventId)
 
   if (rayToken == null) {
     log.warning('[BURN] RAYToken with ID: {} does not exist...', [event.params.tokenId.toHexString()])
   } else {
-    transaction.type = burnType
-    transaction.value = event.params.value
-    transaction.token = rayToken.id
-    transaction.timestamp = event.block.timestamp
-    transaction.tokenValueBefore = rayToken.value
+    tokenEvent.block = event.block.number
+    tokenEvent.timestamp = event.block.timestamp
+    tokenEvent.transaction = event.transaction.hash
+
+    tokenEvent.value = event.params.value
+    tokenEvent.token = rayToken.id
 
     rayToken.value = ZERO
     rayToken.isActive = false
 
-    transaction.tokenValueAfter = ZERO
-
     rayToken.save()
-    transaction.save()
+    tokenEvent.save()
   }
 }
 
@@ -138,16 +152,6 @@ function getOrCreateRayToken(tokenId: Bytes): RAYToken {
   }
 
   return token as RAYToken
-}
-
-function getOrCreateRayTokenTransaction(id: Bytes): RAYTokenTransaction {
-  let transaction = RAYTokenTransaction.load(id.toHexString())
-
-  if (transaction == null) {
-    transaction = new RAYTokenTransaction(id.toHexString())
-  }
-
-  return transaction as RAYTokenTransaction
 }
 
 function getOrCreatePortfolio(portfolioId: Bytes, persist: boolean = true): Portfolio {
