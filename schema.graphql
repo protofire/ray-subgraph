@@ -18,8 +18,11 @@ type RAYToken @entity {
   "Portfolio associated with the RAYToken"
   portfolio: Portfolio!
 
-  "Total value of the RAYToken"
-  value: BigInt!
+  "Latest total value of the RAYToken expressed in the smallest unit of the asset"
+  rawValue: BigInt!
+
+  "Latest total value of the RAYToken expressed in the base unit of the asset"
+  value: BigDecimal!
 
   "List of all events which modified this token"
   events: [RAYTokenEvent!]! @derivedFrom(field: "token")
@@ -57,7 +60,8 @@ type OpportunityToken @entity {
 interface RAYTokenEvent {
   id: ID!
   token: RAYToken!
-  value: BigInt!
+  rawValue: BigInt!
+  value: BigDecimal!
 
   timestamp: BigInt!
   block: BigInt!
@@ -70,14 +74,23 @@ type DepositEvent implements RAYTokenEvent @entity {
   "Token which the event modifies"
   token: RAYToken!
 
+  "Value deposited on the position expressed using the smallest unit for the asset. It can be deposited by anyone"
+  rawValue: BigInt!
+
   "Value deposited on the position. It can be deposited by anyone"
-  value: BigInt!
+  value: BigDecimal!
 
   "Token value before the event happened"
-  tokenValueBefore: BigInt!
+  tokenRawValueBefore: BigInt!
 
   "Token value after the event happened"
-  tokenValueAfter: BigInt!
+  tokenRawValueAfter: BigInt!
+
+  "Token value before the event happened"
+  tokenValueBefore: BigDecimal!
+
+  "Token value after the event happened"
+  tokenValueAfter: BigDecimal!
 
   "Address from where the value to be added was sent"
   sender: Bytes!
@@ -98,14 +111,23 @@ type WithdrawEvent implements RAYTokenEvent @entity {
   "Token which the event modifies"
   token: RAYToken!
 
+  "Value withdrawn from the position expressed using the smallest unit for the asset. It can only be withdrawn by the owner"
+  rawValue: BigInt!
+
   "Value withdrawn from the position. It can only be withdrawn by the owner"
-  value: BigInt!
+  value: BigDecimal!
 
   "Token value before the event happened"
-  tokenValueBefore: BigInt!
+  tokenRawValueBefore: BigInt!
 
   "Token value after the event happened"
-  tokenValueAfter: BigInt!
+  tokenRawValueAfter: BigInt!
+
+  "Token value before the event happened"
+  tokenValueBefore: BigDecimal!
+
+  "Token value after the event happened"
+  tokenValueAfter: BigDecimal!
 
   "Block timestamp of the event"
   timestamp: BigInt!
@@ -123,8 +145,11 @@ type MintEvent implements RAYTokenEvent @entity {
   "Token which the event modifies"
   token: RAYToken!
 
+  "Value to be used as the initial value of the position expressed using the smallest unit for the asset"
+  rawValue: BigInt!
+
   "Value to be used as the initial value of the position"
-  value: BigInt!
+  value: BigDecimal!
 
   "Address which minted the token"
   minter: Bytes!
@@ -145,8 +170,11 @@ type BurnEvent implements RAYTokenEvent @entity {
   "Token which the event modifies"
   token: RAYToken!
 
+  "Value to be returned to the owner with all fees already paid expressed using the smallest unit for the asset"
+  rawValue: BigInt!
+
   "Value to be returned to the owner with all fees already paid"
-  value: BigInt!
+  value: BigDecimal!
 
   "Block timestamp of the event"
   timestamp: BigInt!
