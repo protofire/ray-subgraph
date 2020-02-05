@@ -1,4 +1,4 @@
-import { Bytes, BigInt, log } from '@graphprotocol/graph-ts'
+import { Bytes, BigInt, log, Address } from '@graphprotocol/graph-ts'
 
 import {
   LogMintOpportunityToken,
@@ -18,9 +18,19 @@ import {
   WithdrawEvent,
   MintEvent,
   BurnEvent,
+  Asset,
 } from '../generated/schema'
 
+import { ERC20 } from '../generated/PortfolioManager/ERC20'
+import { toDecimal, DEFAULT_DECIMALS } from './utils/decimals'
+
 let ZERO = BigInt.fromI32(0)
+
+let DAI_ADDRESS = Address.fromString('0x6b175474e89094c44da98b954eedeac495271d0f')
+let SAI_ADDRESS = Address.fromString('0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359')
+let WETH_ADDRESS = Address.fromString('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2')
+let USDC_ADDRESS = Address.fromString('0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
+let GENESIS_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000')
 
 export function handleMintRAYToken(event: LogMintRAYT): void {
   let user = getOrCreateUser(event.params.beneficiary)
@@ -159,6 +169,10 @@ function getOrCreatePortfolio(portfolioId: Bytes, persist: boolean = true): Port
 
   if (portfolio == null) {
     portfolio = new Portfolio(portfolioId.toHexString())
+    let assetAddress = getTokenAddressFromPortfolioId(portfolioId)
+    let asset = getOrCreateAsset(assetAddress)
+
+    portfolio.asset = asset.id
 
     if (persist) {
       portfolio.save()
@@ -180,4 +194,94 @@ function getOrCreateOpportunityToken(tokenId: Bytes, persist: boolean = true): O
   }
 
   return token as OpportunityToken
+}
+
+function getOrCreateAsset(tokenAddress: Address, persist: boolean = true): Asset {
+  let token = Asset.load(tokenAddress.toHexString())
+
+  if (token == null) {
+    token = new Asset(tokenAddress.toHexString())
+    token.address = tokenAddress
+
+    if (tokenAddress != GENESIS_ADDRESS) {
+      let erc20Token = ERC20.bind(tokenAddress)
+
+      let tokenDecimals = erc20Token.try_decimals()
+      let tokenName = erc20Token.try_name()
+      let tokenSymbol = erc20Token.try_symbol()
+
+      token.decimals = !tokenDecimals.reverted ? tokenDecimals.value : DEFAULT_DECIMALS
+      token.name = !tokenName.reverted ? tokenName.value : ''
+      token.symbol = !tokenSymbol.reverted ? tokenSymbol.value : ''
+
+      // Handle Single-Collateral Dai manually since isn't a detailed token
+      if (token.address.toHexString() == '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359') {
+        token.decimals = 18
+        token.name = 'Sai Stablecoin v1.0'
+        token.symbol = 'SAI'
+      }
+    } else {
+      token.decimals = 0
+      token.name = 'Unknown Asset'
+      token.symbol = ''
+    }
+
+    if (persist) {
+      token.save()
+    }
+  }
+
+  return token as Asset
+}
+
+function getTokenAddressFromPortfolioId(portfolioId: Bytes): Address {
+  let daiIds = new Array<string>(5)
+  daiIds.push('0x810522b60dd90f9263d4e301357c9db1e75e63e814939ae109ccb964c96a93d3')
+  daiIds.push('0x5511fa880353535668e2ba60b8800f49aecb527b143c19b933173d617dc4aea6')
+  daiIds.push('0xea493a2b306e3c3f7548c41cac3b9d360cb7d46e1563bd9346f7e398d03e45fd')
+  daiIds.push('0x5eea78fbdb7992da6f036e65ddb403b29aa15ba18be856f1e0ede3b1657d9b02')
+  daiIds.push('0xcd55522e8f4c89017906f06cb11574a4cb79176b18a2a208e08780d079453c79')
+
+  let wethIds = new Array<string>(7)
+  wethIds.push('0xbe72e724d4b9326428f7faca782d2dcc9e3e10824e8cf48a6499f23d695fd018')
+  wethIds.push('0x89bdc287eca0056552bd2979865efb44e5f19fdc962accefb49f7eefc0e55ea9')
+  wethIds.push('0xe1d9f3a90e5d350eec05cd47282029fcf71c7c09c29c032f198eeffc936975b6')
+  wethIds.push('0xf26c69dbf25f9fb2bf793e4847f7c619cbc3323cb4ff988fb0ce4c5ea45affa1')
+  wethIds.push('0x21590982edcc6d2c9b986dd8174fda53c28d1a919c8bf9b58ead7d441b306439')
+  wethIds.push('0x5870955881b5219ec3d880e8ad25206c312127210a5695618971c47541982994')
+  wethIds.push('0xa49d129cd260862e8226f232c7d2ab0dd7302e2bcb49847810392625b7dbf3f6')
+
+  let saiIds = new Array<string>(7)
+  saiIds.push('0x87e3990b15e1e64e3a17b0e4ebfcc4c03cc5ec64a33b442ae01ef15d9dadb575')
+  saiIds.push('0xe51a4786828f3cbbdd643cd0d415c0f45bdbf7ec739dbdb2e64d6ac97bf103f1')
+  saiIds.push('0xae52c5b4d809b421d746d3a7bde807ea6ec242ae13ae1b2bc6434493acf26d8b')
+  saiIds.push('0xd33be800bb630e1ae95562a75be01b1b77a96386f99b3faa97a828b28c92dbb9')
+  saiIds.push('0x165de3655459c6088f957bdb2877779c94aa17af570340349630726914a826fa')
+  saiIds.push('0xcd93cf275bcc8c600887dc587ea0a16e8f0a87fa7f99560f72186069c8d3b3df')
+  saiIds.push('0xf21acfdd065ab7839f3b0c66c441c6366b2240db1c3fa7c7da134c9be316fcd0')
+
+  let usdcIds = new Array<string>(7)
+  usdcIds.push('0x7c80b0e3ce0d2cabe1a3dfc888fca469bab09beccc3496f88cba8613d159a65b')
+  usdcIds.push('0x1e868d302424cfebaf2b757c06fdd1a32411fd445ebb51ffc433cc15bacfe3e3')
+  usdcIds.push('0x978274153eec4f3c072b45a6268ae86c0e61033c7a817328b407954972369b1d')
+  usdcIds.push('0xf904b00f34beab1e77301f192a7fe866c4936fb9ea30e65543df5dc2d9176c69')
+  usdcIds.push('0xb6cb9e19cd1b048a65dffcccc3a071c8d2d89ad070a0dca6f7efdf4ee7ab9e51')
+  usdcIds.push('0x839de554365a548fbb6bf9b32952a781e00390bb8454a2bb8f4f3bbed40bc92c')
+  usdcIds.push('0x4672ce0a5532a592a953596e6c19fc1cb1bd89cdaf2f6d6b4c71d5f8b6f7f58a')
+
+  if (daiIds.includes(portfolioId.toHex())) {
+    return DAI_ADDRESS
+  } else if (saiIds.includes(portfolioId.toHex())) {
+    return SAI_ADDRESS
+  } else if (usdcIds.includes(portfolioId.toHex())) {
+    return USDC_ADDRESS
+  } else if (wethIds.includes(portfolioId.toHex())) {
+    return WETH_ADDRESS
+  } else {
+    log.warning('Portfolio with id {} was not found and defaulted to {}', [
+      portfolioId.toHexString(),
+      GENESIS_ADDRESS.toHexString(),
+    ])
+    return GENESIS_ADDRESS
+  }
 }

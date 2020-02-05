@@ -41,6 +41,8 @@ type Opportunity @entity {
 type Portfolio @entity {
   id: ID!
 
+  asset: Asset!
+
   "Opportunities which this Portfolio has tokens in"
   opportunities: [Opportunity!]! @derivedFrom(field: "portfolio")
 }
@@ -154,4 +156,21 @@ type BurnEvent implements RAYTokenEvent @entity {
 
   "Transaction hash"
   transaction: Bytes!
+}
+
+# Assets/Coins
+
+type Asset @entity {
+  id: ID!
+
+  "Blockchain address of the ERC20token/asset"
+  address: Bytes!
+
+  "String which represents the name of said asset"
+  name: String!
+
+  "Short string representing the symbol used for said asset"
+  symbol: String!
+
+  decimals: Int!
 }

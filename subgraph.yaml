@@ -17,6 +17,8 @@ dataSources:
       abis:
         - name: PortfolioManager
           file: ./abis/PortfolioManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       entities:
         - User
         - RAYToken
@@ -26,6 +28,7 @@ dataSources:
         - BurnEvent
         - Opportunity
         - Portfolio
+        - Asset
         - OpportunityToken
       eventHandlers:
         - event: LogMintOpportunityToken(bytes32,indexed bytes32)
