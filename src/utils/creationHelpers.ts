@@ -109,13 +109,21 @@ function getOrCreateDepositEvent(eventId: String): DepositEvent {
 }
 
 function getOrCreateAsset(tokenAddress: Address, persist: boolean = true): Asset {
-  let token = Asset.load(tokenAddress.toHexString())
+  let addressString = tokenAddress.toHexString()
+
+  let token = Asset.load(addressString)
 
   if (token == null) {
-    token = new Asset(tokenAddress.toHexString())
-    token.address = tokenAddress
+    token = new Asset(addressString)
 
-    if (tokenAddress != GENESIS_ADDRESS) {
+    if (tokenAddress == GENESIS_ADDRESS) {
+      token.address = null
+      token.decimals = 0
+      token.name = 'Unknown Asset'
+      token.symbol = ''
+    } else {
+      token.address = tokenAddress
+
       let erc20Token = ERC20.bind(tokenAddress)
 
       let tokenDecimals = erc20Token.try_decimals()
@@ -132,10 +140,6 @@ function getOrCreateAsset(tokenAddress: Address, persist: boolean = true): Asset
         token.name = 'Sai Stablecoin v1.0'
         token.symbol = 'SAI'
       }
-    } else {
-      token.decimals = 0
-      token.name = 'Unknown Asset'
-      token.symbol = ''
     }
 
     if (persist) {
@@ -190,7 +194,7 @@ function getTokenAddressFromPortfolioId(portfolioId: String): Address {
   } else if (wethIds.includes(portfolioId)) {
     return WETH_ADDRESS
   } else {
-    log.warning('Portfolio with id {} was not found and defaulted to {}', [portfolioId, GENESIS_ADDRESS.toHexString()])
+    log.warning('Portfolio with id {} was not found in the portfolioId List', [portfolioId])
     return GENESIS_ADDRESS
   }
 }

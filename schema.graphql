@@ -192,7 +192,7 @@ type Asset @entity {
   id: ID!
 
   "Blockchain address of the ERC20token/asset"
-  address: Bytes!
+  address: Bytes
 
   "String which represents the name of said asset"
   name: String!
