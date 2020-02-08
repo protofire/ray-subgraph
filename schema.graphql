@@ -34,6 +34,9 @@ type RAYToken @entity {
 type Opportunity @entity {
   id: ID!
 
+  "Blockchain address of this Opportunity"
+  address: Bytes!
+
   "Portfolio which has this opportunity listed"
   portfolio: Portfolio!
 
@@ -44,15 +47,27 @@ type Opportunity @entity {
 type Portfolio @entity {
   id: ID!
 
+  "Asset used for all transactions of this portfolio"
   asset: Asset!
+
+  "RAYTokens using this portfolio"
+  raytokens: [RAYToken!]! @derivedFrom(field: "portfolio")
 
   "Opportunities which this Portfolio has tokens in"
   opportunities: [Opportunity!]! @derivedFrom(field: "portfolio")
+
+  "Opportunity tokens that this portfolio uses"
+  tokens: [OpportunityToken!]! @derivedFrom(field: "portfolio")
 }
 
 type OpportunityToken @entity {
   id: ID!
-  opportunities: [Opportunity!]! @derivedFrom(field: "token")
+
+  "Opportunity which this token corresponds to"
+  opportunity: Opportunity
+
+  "Portfolio in which this token is being used"
+  portfolio: Portfolio!
 }
 
 # Token events

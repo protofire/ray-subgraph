@@ -1,0 +1,255 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "deprecated",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "_storage",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "__storage",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "opportunityId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "principalToken",
+        "type": "address"
+      }
+    ],
+    "name": "LogSupplyToOpportunity",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "opportunityId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "principalToken",
+        "type": "address"
+      }
+    ],
+    "name": "LogWithdrawFromOpportunity",
+    "type": "event"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "opportunityId",
+        "type": "bytes32"
+      },
+      {
+        "name": "beneficiary",
+        "type": "address"
+      },
+      {
+        "name": "opportunity",
+        "type": "address"
+      },
+      {
+        "name": "principalToken",
+        "type": "address"
+      },
+      {
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "name": "isERC20",
+        "type": "bool"
+      }
+    ],
+    "name": "buyPosition",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "opportunityId",
+        "type": "bytes32"
+      },
+      {
+        "name": "tokenId",
+        "type": "bytes32"
+      },
+      {
+        "name": "opportunity",
+        "type": "address"
+      },
+      {
+        "name": "principalToken",
+        "type": "address"
+      },
+      {
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "name": "isERC20",
+        "type": "bool"
+      }
+    ],
+    "name": "increasePosition",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "opportunityId",
+        "type": "bytes32"
+      },
+      {
+        "name": "tokenId",
+        "type": "bytes32"
+      },
+      {
+        "name": "opportunity",
+        "type": "address"
+      },
+      {
+        "name": "principalToken",
+        "type": "address"
+      },
+      {
+        "name": "valueToWithdraw",
+        "type": "uint256"
+      },
+      {
+        "name": "isERC20",
+        "type": "bool"
+      }
+    ],
+    "name": "withdrawPosition",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "name": "beneficiary",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "value",
+        "type": "bool"
+      }
+    ],
+    "name": "setDeprecated",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "name": "principalToken",
+        "type": "address"
+      },
+      {
+        "name": "isERC20",
+        "type": "bool"
+      }
+    ],
+    "name": "fallbackClaim",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

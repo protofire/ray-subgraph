@@ -26,11 +26,11 @@ function getOrCreateUser(address: Bytes): User {
   return user as User
 }
 
-function getOrCreateRayToken(tokenId: Bytes): RAYToken {
-  let token = RAYToken.load(tokenId.toHexString())
+function getOrCreateRayToken(tokenId: String): RAYToken {
+  let token = RAYToken.load(tokenId)
 
   if (token == null) {
-    token = new RAYToken(tokenId.toHexString())
+    token = new RAYToken(tokenId)
   }
 
   return token as RAYToken
@@ -52,6 +52,20 @@ function getOrCreatePortfolio(portfolioId: String, persist: boolean = true): Por
   }
 
   return portfolio as Portfolio
+}
+
+function getOrCreateOpportunity(opportunityId: String, persist: boolean = true): Opportunity {
+  let opportunity = Opportunity.load(opportunityId)
+
+  if (opportunity == null) {
+    opportunity = new Opportunity(opportunityId)
+
+    if (persist) {
+      opportunity.save()
+    }
+  }
+
+  return opportunity as Opportunity
 }
 
 function getOrCreateOpportunityToken(tokenId: Bytes, persist: boolean = true): OpportunityToken {
@@ -151,12 +165,15 @@ function getOrCreateAsset(tokenAddress: Address, persist: boolean = true): Asset
 }
 
 function getTokenAddressFromPortfolioId(portfolioId: String): Address {
-  let daiIds = new Array<string>(5)
+  let daiIds = new Array<string>(7)
   daiIds.push('0x810522b60dd90f9263d4e301357c9db1e75e63e814939ae109ccb964c96a93d3')
   daiIds.push('0x5511fa880353535668e2ba60b8800f49aecb527b143c19b933173d617dc4aea6')
   daiIds.push('0xea493a2b306e3c3f7548c41cac3b9d360cb7d46e1563bd9346f7e398d03e45fd')
   daiIds.push('0x5eea78fbdb7992da6f036e65ddb403b29aa15ba18be856f1e0ede3b1657d9b02')
   daiIds.push('0xcd55522e8f4c89017906f06cb11574a4cb79176b18a2a208e08780d079453c79')
+  daiIds.push('0xb1608d113051804915ffc8db1ec8ff5fb579cfa976c18072715b2b3a6827f9af')
+  daiIds.push('0xaf723346279a6d14268ec81e79c0d93c083bc40184fa2a463da0da48a9a4d19b')
+  daiIds.push('0xd3ca7dda70d2cee4011f7785c5b4ed158c22a2475d22fa9484cb37137fe5bf11')
 
   let wethIds = new Array<string>(7)
   wethIds.push('0xbe72e724d4b9326428f7faca782d2dcc9e3e10824e8cf48a6499f23d695fd018')
@@ -210,4 +227,5 @@ export {
   getOrCreateDepositEvent,
   getOrCreateWithdrawEvent,
   getOrCreateOpportunityToken,
+  getOrCreateOpportunity,
 }

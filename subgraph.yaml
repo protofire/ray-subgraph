@@ -41,3 +41,30 @@ dataSources:
           handler: handleWithdrawFromRAYToken
         - event: LogBurnRAYT(indexed bytes32,indexed address,uint256,uint256)
           handler: handleBurnRAYToken
+  - name: OpportunityManager
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: OpportunityManager
+      address: '0xa1fc31d0439522bb70c39cc01329e57cdf97fd90'
+      startBlock: 8533657
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      abis:
+        - name: OpportunityManager
+          file: ./abis/OpportunityManager.json
+      entities:
+        - Opportunity
+        - Portfolio
+        - Asset
+        - OpportunityToken
+      callHandlers:
+        - function: buyPosition(bytes32,address,address,address,uint256,bool)
+          handler: handleBuyPosition
+        - function: increasePosition(bytes32,bytes32,address,address,uint256,bool)
+          handler: handleIncreasePosition
+        - function: withdrawPosition(bytes32,bytes32,address,address,uint256,bool)
+          handler: handleWithdrawPosition
