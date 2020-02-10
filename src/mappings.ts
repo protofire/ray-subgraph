@@ -228,7 +228,10 @@ export function handleBuyPosition(call: BuyPositionCall): void {
 
   //checkAndFixAssetDifferenceIfAny(portfolio, asset)
 
-  portfolio.asset = asset.id
+  if (portfolio.asset != asset.id) {
+    portfolio.asset = asset.id
+    portfolio.save()
+  }
 
   opportunity.portfolio = token.portfolio
   opportunity.address = call.inputs.opportunity
