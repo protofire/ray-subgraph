@@ -175,58 +175,12 @@ export function handleMintOpportunityToken(event: LogMintOpportunityToken): void
   // We'll  add the opportunity later, once we get the id from it on the OpportunityManager handlers
   token.save()
 }
-//
-// function checkAndFixAssetDifferenceIfAny(portfolio: Portfolio, asset: Asset): void {
-//   if (portfolio.asset != asset.id) {
-//     let placeholdingAsset = getOrCreateAsset(Address.fromString(portfolio.asset))
-//     if (placeholdingAsset.decimals != asset.decimals) {
-//       log.warning('Some tokens and events might have wrong values, fixing them now.', [])
-//       get all tokens that use this portfolio and update all non-raw values
-//       portfolio.raytokens.forEach((value, index, array) => {
-//         log.warning('foreach Raytokens', [])
-//         fixTokenValuesAndEventValues(value, asset)
-//       })
-//     }
-//     portfolio.asset = asset.id
-//   }
-// }
-
-// function fixTokenValuesAndEventValues(value: String, newAsset: Asset): void {
-//   let token = getOrCreateRayToken(value)
-//   token.value = toDecimal(token.rawValue, newAsset.decimals)
-//
-//   token.events.forEach((value, index, array) => {
-//     log.warning('foreach events', [])
-//     fixEvent(value, newAsset)
-//   })
-//
-//   token.save()
-// }
-
-// function fixEvent(eventId: String, newAsset: Asset): void {
-//   let event = MintEvent.load(eventId)
-//   if (event == null) {
-//     let event = BurnEvent.load(eventId)
-//     if (event == null) {
-//       let event = DepositEvent.load(eventId)
-//       if (event == null) {
-//         let event = WithdrawEvent.load(eventId)
-//       }
-//       event.tokenValueAfter = toDecimal(event.tokenRawValueAfter, newAsset.decimals)
-//       event.tokenValueBefore = toDecimal(event.tokenRawValueBefore, newAsset.decimals)
-//     }
-//   }
-//   event.value = toDecimal(event.rawValue, newAsset.decimals)
-//   event.save()
-// }
 
 export function handleBuyPosition(call: BuyPositionCall): void {
   let token = getOrCreateOpportunityToken(call.outputs.value0)
   let opportunity = getOrCreateOpportunity(call.inputs.opportunityId.toHexString(), false)
   let asset = getOrCreateAsset(call.inputs.principalToken)
   let portfolio = getOrCreatePortfolio(token.portfolio)
-
-  //checkAndFixAssetDifferenceIfAny(portfolio, asset)
 
   if (portfolio.asset != asset.id) {
     portfolio.asset = asset.id
@@ -241,6 +195,10 @@ export function handleBuyPosition(call: BuyPositionCall): void {
   // It might be a good idea to add position tracking at this level, together with the next call handlers
 }
 
-export function handleIncreasePosition(call: IncreasePositionCall): void {}
+export function handleIncreasePosition(call: IncreasePositionCall): void {
+  // ToDo: Position tracking with this handler
+}
 
-export function handleWithdrawPosition(call: WithdrawPositionCall): void {}
+export function handleWithdrawPosition(call: WithdrawPositionCall): void {
+  // ToDo: Position tracking with this handler
+}

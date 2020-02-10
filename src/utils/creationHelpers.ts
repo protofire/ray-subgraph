@@ -132,7 +132,7 @@ function getOrCreateAsset(tokenAddress: Address, persist: boolean = true): Asset
 
     if (tokenAddress == GENESIS_ADDRESS) {
       token.address = null
-      token.decimals = 0
+      token.decimals = DEFAULT_DECIMALS
       token.name = 'Unknown Asset'
       token.symbol = ''
     } else {
