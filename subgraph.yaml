@@ -56,6 +56,8 @@ dataSources:
       abis:
         - name: OpportunityManager
           file: ./abis/OpportunityManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       entities:
         - Opportunity
         - Portfolio
