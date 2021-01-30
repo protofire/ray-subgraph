@@ -11,7 +11,7 @@ dataSources:
       startBlock: 8533644
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       file: ./src/mappings.ts
       abis:
@@ -50,7 +50,7 @@ dataSources:
       startBlock: 8533657
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       file: ./src/mappings.ts
       abis:
